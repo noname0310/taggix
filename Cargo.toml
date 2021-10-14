@@ -4,8 +4,6 @@ version = "0.1.0"
 edition = "2018"
 resolver="2"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [dependencies]
 image = "0.23"
 winit = "0.25"
@@ -14,11 +12,13 @@ env_logger = "0.9"
 log = "0.4"
 wgpu = "0.11"
 pollster = "0.2"
-obj-rs = "0.6"
-async-executor = "1.0"
 byte-slice-cast = "1.0.0"
 bytemuck = { version = "1.4", features = ["derive"] }
+rayon = "1.4"
+tobj = "3.0"
+anyhow = "1.0"
 
-[dependencies.wgt]
-package = "wgpu-types"
-version = "0.11"
+[build-dependencies]
+anyhow = "1.0"
+fs_extra = "1.2"
+glob = "0.3"
