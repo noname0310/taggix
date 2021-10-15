@@ -258,46 +258,88 @@ impl State {
             &device,
             res_dir.join("yyb_school_miku/yyb school miku.obj"),
             vec![
+                // model::Material::new(
+                //     &device,
+                //     "Hair01",//0
+                //     texture::Texture::load(&device, &queue, res_dir.join("yyb_school_miku/Hair01.png"), false).unwrap(),
+                //     &texture_bind_group_layout,
+                // ),
+                // model::Material::new(
+                //     &device,
+                //     "Hair02",//1
+                //     texture::Texture::load(&device, &queue, res_dir.join("yyb_school_miku/Hair02.png"), false).unwrap(),
+                //     &texture_bind_group_layout,
+                // ),
+                // model::Material::new(
+                //     &device,
+                //     "hairclip",//2
+                //     texture::Texture::load(&device, &queue, res_dir.join("yyb_school_miku/hairclip.png"), false).unwrap(),
+                //     &texture_bind_group_layout,
+                // ),
+                // model::Material::new(
+                //     &device,
+                //     "head",//3
+                //     texture::Texture::load(&device, &queue, res_dir.join("yyb_school_miku/head.png"), false).unwrap(),
+                //     &texture_bind_group_layout,
+                // ),
+                // model::Material::new(
+                //     &device,
+                //     "Material 4_UVP",//4
+                //     texture::Texture::load(&device, &queue, res_dir.join("yyb_school_miku/Material 4_UVP.png"), false).unwrap(),
+                //     &texture_bind_group_layout,
+                // ),
+                // model::Material::new(
+                //     &device,
+                //     "skin",//5
+                //     texture::Texture::load(&device, &queue, res_dir.join("yyb_school_miku/skin.png"), false).unwrap(),
+                //     &texture_bind_group_layout,
+                // ),
+                // model::Material::new(
+                //     &device,
+                //     "socks",//6
+                //     texture::Texture::load(&device, &queue, res_dir.join("yyb_school_miku/socks.png"), false).unwrap(),
+                //     &texture_bind_group_layout,
+                // ),
                 model::Material::new(
                     &device,
                     "Hair01",//0
-                    texture::Texture::load(&device, &queue, res_dir.join("yyb_school_miku/Hair01.png"), false).unwrap(),
+                    texture::Texture::from_bytes(&device, &queue, include_bytes!("../res/yyb_school_miku/Hair01.png"), "Hair01", false).unwrap(),
                     &texture_bind_group_layout,
                 ),
                 model::Material::new(
                     &device,
                     "Hair02",//1
-                    texture::Texture::load(&device, &queue, res_dir.join("yyb_school_miku/Hair02.png"), false).unwrap(),
+                    texture::Texture::from_bytes(&device, &queue, include_bytes!("../res/yyb_school_miku/Hair02.png"), "Hair02", false).unwrap(),
                     &texture_bind_group_layout,
                 ),
                 model::Material::new(
                     &device,
                     "hairclip",//2
-                    texture::Texture::load(&device, &queue, res_dir.join("yyb_school_miku/hairclip.png"), false).unwrap(),
+                    texture::Texture::from_bytes(&device, &queue, include_bytes!("../res/yyb_school_miku/hairclip.png"), "hairclip", false).unwrap(),
                     &texture_bind_group_layout,
                 ),
                 model::Material::new(
                     &device,
                     "head",//3
-                    texture::Texture::load(&device, &queue, res_dir.join("yyb_school_miku/head.png"), false).unwrap(),
+                    texture::Texture::from_bytes(&device, &queue, include_bytes!("../res/yyb_school_miku/head.png"), "head", false).unwrap(),
                     &texture_bind_group_layout,
                 ),
                 model::Material::new(
                     &device,
                     "Material 4_UVP",//4
-                    texture::Texture::load(&device, &queue, res_dir.join("yyb_school_miku/Material 4_UVP.png"), false).unwrap(),
+                    texture::Texture::from_bytes(&device, &queue, include_bytes!("../res/yyb_school_miku/Material 4_UVP.png"), "Material", false).unwrap(),
                     &texture_bind_group_layout,
                 ),
                 model::Material::new(
                     &device,
                     "skin",//5
-                    texture::Texture::load(&device, &queue, res_dir.join("yyb_school_miku/skin.png"), false).unwrap(),
+                    texture::Texture::from_bytes(&device, &queue, include_bytes!("../res/yyb_school_miku/skin.png"), "skin", false).unwrap(),
                     &texture_bind_group_layout,
                 ),
                 model::Material::new(
                     &device,
                     "socks",//6
-                    texture::Texture::load(&device, &queue, res_dir.join("yyb_school_miku/socks.png"), false).unwrap(),
+                    texture::Texture::from_bytes(&device, &queue, include_bytes!("../res/yyb_school_miku/socks.png"), "socks", false).unwrap(),
                     &texture_bind_group_layout,
                 ),
             ],

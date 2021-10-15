@@ -20,8 +20,7 @@ impl Texture {
         // Needed to appease the borrow checker
         let path_copy = path.as_ref().to_path_buf();
         let label = path_copy.to_str();
-
-        let img = image::open(path)?.flipv();
+        let img = image::open(path)?;
         Self::from_image(device, queue, &img, label, is_normal_map)
     }
 
@@ -85,6 +84,7 @@ impl Texture {
         label: Option<&str>,
         is_normal_map: bool,
     ) -> Result<Self> {
+        let img = img.flipv();
         let dimensions = img.dimensions();
         let rgba = img.to_rgba8();
 
