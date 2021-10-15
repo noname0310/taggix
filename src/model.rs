@@ -1,4 +1,5 @@
 use anyhow::*;
+use std::io::BufRead;
 use std::ops::Range;
 use std::path::Path;
 use tobj::LoadOptions;
@@ -199,6 +200,62 @@ impl Model {
             });
             let index_buffer = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
                 label: Some(&format!("{:?} Index Buffer", path.as_ref())),
+                contents: bytemuck::cast_slice(&m.mesh.indices),
+                usage: wgpu::BufferUsages::INDEX,
+            });
+
+            meshes.push(Mesh {
+                name: m.name,
+                vertex_buffer,
+                index_buffer,
+                num_elements: m.mesh.indices.len() as u32,
+                material: material_indices[i],
+            });
+        }
+
+        Ok(Self { meshes, materials })
+    }
+
+    pub fn load_mesh_buf<B: BufRead>(
+        device: &wgpu::Device,
+        mut buf: B,
+        materials: Vec<Material>,
+        material_indices: Vec<usize>,
+        name: &str,
+    ) -> Result<Self> {
+        let (obj_models, _) = tobj::load_obj_buf(
+            &mut buf,
+            &LoadOptions {
+                triangulate: true,
+                single_index: true,
+                
+                ..Default::default()
+            },
+            |_|{ Err(tobj::LoadError::OpenFileFailed) },
+        )?;
+
+        let mut meshes = Vec::new();
+        for (i, m) in obj_models.into_iter().enumerate() {
+            let mut vertices = Vec::new();
+            for i in 0..m.mesh.positions.len() / 3 {
+                vertices.push(ModelVertex {
+                    position: [
+                        m.mesh.positions[i * 3],
+                        m.mesh.positions[i * 3 + 1],
+                        m.mesh.positions[i * 3 + 2],
+                    ]
+                    .into(),
+                    tex_coords: [m.mesh.texcoords[i * 2], m.mesh.texcoords[i * 2 + 1]].into(),
+                });
+            }
+
+            let vertex_buffer = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
+                label: Some(&format!("{:?} Vertex Buffer", name)),
+                contents: bytemuck::cast_slice(&vertices),
+                usage: wgpu::BufferUsages::VERTEX,
+            });
+            let index_buffer = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
+                label: Some(&format!("{:?} Index Buffer", name)),
                 contents: bytemuck::cast_slice(&m.mesh.indices),
                 usage: wgpu::BufferUsages::INDEX,
             });
