@@ -183,7 +183,7 @@ impl State {
         let camera = camera::Camera::new((-1.2, 13.0, 25.0), cgmath::Deg(-90.0), cgmath::Deg(-5.0));
         let projection =
             camera::Projection::new(config.width, config.height, cgmath::Deg(45.0), 0.1, 100.0);
-        let camera_controller = camera::CameraController::new(4.0, 0.4);
+        let camera_controller = camera::CameraController::new(4.0 * 5.0, 0.4);
 
         let mut camera_uniform = CameraUniform::new();
         camera_uniform.update_view_proj(&camera, &projection);
