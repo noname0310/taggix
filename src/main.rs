@@ -57,6 +57,7 @@ struct State {
     #[allow(dead_code)]
     debug_material: model::Material,
     mouse_pressed: bool,
+    mouse_position: Option<winit::dpi::PhysicalPosition<f64>>,
 }
 
 fn create_render_pipeline(
@@ -257,93 +258,7 @@ impl State {
         let obj_model = model::Model::load_mesh_buf(
             &device,
             &include_bytes!("../res/yyb_school_miku_pose/yyb bake r.obj")[..],
-            //res_dir.join("yyb_school_miku/yyb school miku.obj"),
             vec![
-                // model::Material::new(
-                //     &device,
-                //     "Hair01",//0
-                //     texture::Texture::load(&device, &queue, res_dir.join("yyb_school_miku/Hair01.png"), false).unwrap(),
-                //     &texture_bind_group_layout,
-                // ),
-                // model::Material::new(
-                //     &device,
-                //     "Hair02",//1
-                //     texture::Texture::load(&device, &queue, res_dir.join("yyb_school_miku/Hair02.png"), false).unwrap(),
-                //     &texture_bind_group_layout,
-                // ),
-                // model::Material::new(
-                //     &device,
-                //     "hairclip",//2
-                //     texture::Texture::load(&device, &queue, res_dir.join("yyb_school_miku/hairclip.png"), false).unwrap(),
-                //     &texture_bind_group_layout,
-                // ),
-                // model::Material::new(
-                //     &device,
-                //     "head",//3
-                //     texture::Texture::load(&device, &queue, res_dir.join("yyb_school_miku/head.png"), false).unwrap(),
-                //     &texture_bind_group_layout,
-                // ),
-                // model::Material::new(
-                //     &device,
-                //     "Material 4_UVP",//4
-                //     texture::Texture::load(&device, &queue, res_dir.join("yyb_school_miku/Material 4_UVP.png"), false).unwrap(),
-                //     &texture_bind_group_layout,
-                // ),
-                // model::Material::new(
-                //     &device,
-                //     "skin",//5
-                //     texture::Texture::load(&device, &queue, res_dir.join("yyb_school_miku/skin.png"), false).unwrap(),
-                //     &texture_bind_group_layout,
-                // ),
-                // model::Material::new(
-                //     &device,
-                //     "socks",//6
-                //     texture::Texture::load(&device, &queue, res_dir.join("yyb_school_miku/socks.png"), false).unwrap(),
-                //     &texture_bind_group_layout,
-                // ),
-                
-                // model::Material::new(
-                //     &device,
-                //     "Hair01",//0
-                //     texture::Texture::from_bytes(&device, &queue, include_bytes!("../res/yyb_school_miku/Hair01.png"), "Hair01", false).unwrap(),
-                //     &texture_bind_group_layout,
-                // ),
-                // model::Material::new(
-                //     &device,
-                //     "Hair02",//1
-                //     texture::Texture::from_bytes(&device, &queue, include_bytes!("../res/yyb_school_miku/Hair02.png"), "Hair02", false).unwrap(),
-                //     &texture_bind_group_layout,
-                // ),
-                // model::Material::new(
-                //     &device,
-                //     "hairclip",//2
-                //     texture::Texture::from_bytes(&device, &queue, include_bytes!("../res/yyb_school_miku/hairclip.png"), "hairclip", false).unwrap(),
-                //     &texture_bind_group_layout,
-                // ),
-                // model::Material::new(
-                //     &device,
-                //     "head",//3
-                //     texture::Texture::from_bytes(&device, &queue, include_bytes!("../res/yyb_school_miku/head.png"), "head", false).unwrap(),
-                //     &texture_bind_group_layout,
-                // ),
-                // model::Material::new(
-                //     &device,
-                //     "Material 4_UVP",//4
-                //     texture::Texture::from_bytes(&device, &queue, include_bytes!("../res/yyb_school_miku/Material 4_UVP.png"), "Material", false).unwrap(),
-                //     &texture_bind_group_layout,
-                // ),
-                // model::Material::new(
-                //     &device,
-                //     "skin",//5
-                //     texture::Texture::from_bytes(&device, &queue, include_bytes!("../res/yyb_school_miku/skin.png"), "skin", false).unwrap(),
-                //     &texture_bind_group_layout,
-                // ),
-                // model::Material::new(
-                //     &device,
-                //     "socks",//6
-                //     texture::Texture::from_bytes(&device, &queue, include_bytes!("../res/yyb_school_miku/socks.png"), "socks", false).unwrap(),
-                //     &texture_bind_group_layout,
-                // ),
                 model::Material::new(
                     &device,
                     "hairpin",
@@ -483,6 +398,7 @@ impl State {
             #[allow(dead_code)]
             debug_material,
             mouse_pressed: false,
+            mouse_position: None,
         }
     }
 
@@ -498,27 +414,44 @@ impl State {
         }
     }
 
-    fn input(&mut self, event: &DeviceEvent) -> bool {
+    fn input(&mut self, event: &WindowEvent) -> bool {
         match event {
-            DeviceEvent::Key(KeyboardInput {
-                virtual_keycode: Some(key),
-                state,
+            WindowEvent::KeyboardInput {  
+                input: KeyboardInput {
+                    virtual_keycode: Some(key),
+                    state,
+                    ..
+                },
                 ..
-            }) => self.camera_controller.process_keyboard(*key, *state),
-            DeviceEvent::MouseWheel { delta, .. } => {
+            } => self.camera_controller.process_keyboard(*key, *state),
+            WindowEvent::MouseWheel { delta, .. } => {
                 self.camera_controller.process_scroll(delta);
                 true
             }
-            DeviceEvent::Button {
-                button: 1, // Left Mouse Button
+            WindowEvent::MouseInput {
+                button: MouseButton::Left,
                 state,
+                ..
             } => {
                 self.mouse_pressed = *state == ElementState::Pressed;
+                if *state == ElementState::Released {
+                    self.mouse_position = None;
+                }
                 true
             }
-            DeviceEvent::MouseMotion { delta } => {
+            WindowEvent::CursorMoved { position: delta, .. } => {
                 if self.mouse_pressed {
-                    self.camera_controller.process_mouse(delta.0, delta.1);
+                    if self.mouse_position.is_none() {
+                        self.mouse_position = Some(delta.to_owned());
+                    }
+                    if let Some(mouse_position) = self.mouse_position {
+                        self.camera_controller.process_mouse(
+                            (delta.x - mouse_position.x) / self.config.width as f64 * 500.0,
+                            (delta.y - mouse_position.y) / self.config.height as f64 * 500.0,
+                        );
+                        self.mouse_position = Some(delta.to_owned());
+                    }
+                    //self.camera_controller.process_mouse(self.mouse_position.x - delta.x, delta.y);
                 }
                 true
             }
@@ -612,12 +545,6 @@ fn main() {
         *control_flow = ControlFlow::Poll;
         match event {
             Event::MainEventsCleared => window.request_redraw(),
-            Event::DeviceEvent {
-                ref event,
-                .. // We're not using device_id currently
-            } => {
-                state.input(event);
-            }
             Event::WindowEvent {
                 ref event,
                 window_id,
@@ -641,6 +568,7 @@ fn main() {
                     }
                     _ => {}
                 }
+                state.input(event);
             }
             Event::RedrawRequested(_) => {
                 let now = std::time::Instant::now();
